@@ -305,6 +305,186 @@ void load_program() {
 /************************************************************/
 void handle_instruction()
 {
+	uint32_t current_inst = mem_read_32(CURRENT_STATE.REGS);
+	int op_code = (current_inst & 0xFC000000) >> 28;
+	int funct = (current_inst & 0x1f);
+	switch (op_code){
+		case '000000':
+			int rs = (current_inst & 0x3E00000) >> 21;
+			int rt; = (current_inst & 0x1F0000) >> 16;
+			int rd; = (current_inst & 0xF800) >> 11;
+			switch(funct){
+				case '100000'		//ADD
+					&rd = &rt + &rs;
+					break;
+
+				case '100001'		//ADDU
+					&rd = &rt + &rs;
+					break;
+
+				case '100100'		//AND
+					break;
+
+				case '100010'		//SUB
+
+					break;
+
+				case '100011'		//SUBU
+
+					break;
+
+				case '011000'		//MULT
+
+					break;
+
+				case '011001'		//MULTU
+
+					break;
+
+				case '011010'		//DIV
+
+					break;
+
+				case '011011'		//DIVU
+
+					break;
+
+				case '100101'		//OR
+
+					break;
+
+				case '100110'		//XOR
+
+					break;
+
+				case '100111'		//NOR
+
+					break;
+
+				case '101010'		//SLT
+
+					break;
+
+				case '001000'		//JR
+
+					break;
+
+				case '001001'		//JALR
+
+					break;
+
+				case '000000'		//SLL
+
+					break;
+
+				case '000010'		//SRL
+
+					break;
+
+				case '000011'		//SRA
+
+					break;
+
+				case '010000'		//MFHI
+
+					break;
+
+				case '010010'		//MFLO
+
+					break;
+
+				case '010001'		//MTHI
+
+					break;
+
+				case '010011'		//MTLO
+
+					break;
+
+			}
+			break;
+		case '001000':				//ADDI
+
+			break;
+
+		case '001001':				//ADDIU
+
+			break;
+
+		case '001100':				//ANDI
+
+			break;
+
+		case '001101':				//ORI
+
+			break;
+
+		case '001110':				//XORI
+
+			break;
+
+		case '001010':				//SLTI
+
+			break;
+
+		case '000010':				//J
+
+			break;
+
+		case '000011':				//JAL
+
+			break;
+
+		case '100011':				//LW
+
+			break;
+
+		case '100000':				//LB
+
+			break;
+
+		case '100001':				//LH
+
+			break;
+
+		case '001111':				//LUI
+
+			break;
+
+		case '101011':				//SW
+
+			break;
+
+		case '101000':				//SB
+
+			break;
+
+		case '101001':				//SH
+
+			break;
+
+		case '000100':				//BEQ
+
+			break;
+
+		case '000101':				//BNE
+
+			break;
+
+		case '000110':				//BLEZ
+
+			break;
+
+		case '000001':
+			if (funct == 00000){}		//BLTZ
+				else{}			//BGEZ
+
+			break;
+
+		case '000111':				//BGTZ
+
+			break;
+	}
 	/*IMPLEMENT THIS*/
 	/* execute one instruction at a time. Use/update CURRENT_STATE and and NEXT_STATE, as necessary.*/
 }
