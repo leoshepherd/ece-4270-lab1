@@ -129,8 +129,7 @@ void mdump(uint32_t start, uint32_t stop) {
 /***************************************************************/
 /* Dump current values of registers to the teminal                                              */   
 /***************************************************************/
-void rdump() {                               
-	B
+void rdump() {                              
 	int i; 
 	printf("-------------------------------------\n");
 	printf("Dumping Register Content\n");
@@ -301,114 +300,102 @@ void load_program() {
 	printf("Program loaded into memory.\n%d words written into memory.\n\n", PROGRAM_SIZE);
 	fclose(fp);
 }
+B
 
 /************************************************************/
 /* decode and execute instruction                                                                     */ 
 /************************************************************/
 void handle_instruction()
 {
-	    uint32_t current_inst = mem_read_32(*CURRENT_STATE); 	//get current instruction
+	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
 	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;     	//get op code of instruction
 	    uint32_t funct = (current_inst & 0x1f);           	      	//get function code of instruction 
-	    uint32_t rs_temp = (current_inst & 0x3E00000) >> 21;	//get rs register of instruction
-            uint32_t rt_temp = (current_inst & 0x1F0000) >> 16;		//get rt register of instruction
-            uint32_t rd_temp = (current_inst & 0xF800) >> 11;		//get desination register of instruction
+	    uint32_t rs = (current_inst & 0x3E00000) >> 21;	//get rs register of instruction
+            uint32_t rt = (current_inst & 0x1F0000) >> 16;		//get rt register of instruction
+            uint32_t rd = (current_inst & 0xF800) >> 11;		//get desination register of instruction
 	    uint32_t target = (current_inst & 0x3FFFFFF);		//get target register
 	    uint32_t immediate = (current_inst & 0xffff);		//get immediate value
-            uint32_t rs = mem_read_32(rs_temp);				//extract data from registers
-            uint32_t rt = mem_read_32(rt_temp);
-            uint32_t rd;
 
 	if(op_code == 0b000000){
             switch(funct)
 		{
                 case 0b100000:        //ADD
-                    rd = rt + rs;
-                    mem_write_32(rd_temp, rd);
+		    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + CURRENT_STATE.REGS[rs];
                     break;
 
                 case 0b100001:        //ADDU
-                    rd = rt + rs;
-                    mem_write_32(rd_temp, rd);
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + CURRENT_STATE.REGS[rs];
                     break;
 
                 case 0b100100:        //AND
-                    rd = rt & rs;
-                    mem_write_32(rd_temp, rd);
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] & CURRENT_STATE.REGS[rs];
                     break;
 
                 case 0b100010:        //SUB
-                    rd = rs - rt;
-                    mem_write_32(rd_temp, rd);
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] - CURRENT_STATE.REGS[rt];
                     break;
 
                 case 0b100011:        //SUBU
-                    rd = rs - rt;
-                    mem_write_32(rd_temp, rd);
-                    break;
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] - CURRENT_STATE.REGS[rt];
+                                        break;
 
                 case 0b011000:        //MULT
-                    rd = rs * rt;
-                    mem_write_32(rd_temp,rd);
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] * CURRENT_STATE.REGS[rs];
                     break;
 
                 case 0b011001:        //MULTU
-                    rd = rs * rt;
-                    mem_write_32(rd_temp,rd);
-		    B
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] * CURRENT_STATE.REGS[rs];
                     break;
 
                 case 0b011010:        //DIV
                     if (rt != 0){
-                        uint32_t temp = rs / rt;
-                        mem_write_32(CURRENT_STATE.HI, temp);
+                        NEXT_STATE.HI = CURRENT_STATE.REGS[rs] / CURRENT_STATE.REGS[rt];
                     }
                     else{
-                        printf("ERROR: result udefined, zero devisor");
+                        printf("ERROR: result undefined, zero devisor");
                     }
                     break;
 
                 case 0b011011:        //DIVU
                     if (rt != 0){
-                        uint32_t temp = rs / rt;
-                        mem_write_32(CURRENT_STATE.HI, temp);
+                        NEXT_STATE.HI = CURRENT_STATE.REGS[rs] / CURRENT_STATE.REGS[rt];
+                    }
+                    else{
+                        printf("ERROR: result undefined, zero devisor");
+                    }
                     break;
-
                 
                 case 0b100101:        //OR
-                    rd = rt || rs;
-                    mem_write_32(rd_temp, rd);
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] | CURRENT_STATE.REGS[rs];
                     break;
 
                 case 0b100110:        //XOR
-                    rd = rs ^ rt;
-		    mem_write_32(rd_temp, rd);
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] ^ CURRENT_STATE.REGS[rs];
                     break;
 
                 case 0b100111:        //NOR
-                    rd = !(rt || rs);
-                    mem_write_32(rd_temp, rd);
+                    NEXT_STATE.REGS[rd] = ~(CURRENT_STATE.REGS[rt] | CURRENT_STATE.REGS[rs]);
                     break;
 
                 case 0b101010:        //SLT
-		    if (rs < rt){
-			rd = 1;
+		    if (CURRENT_STATE.REGS[rs] < CURRENT_STAE.REGS[rt]){
+			NEXT_STATE.REGS[rd] = 1;
 		    }
 		    else{
-			rd = 0;
+			NEXT_STATE.REGS[rd] = 0;
 		    }
 		    mem_write_32(rd_temp, rd);
                     break;
 
                 case 0b001000:        //JR
-		    NEXT_STATE = rs;
+		    NEXT_STATE.PC = CURRENT_STATE.REGS[rs];
                     break;
 
                 case 0b001001:        //JALR
-
-                    break;
-
-                case 0b000000:        //SLL
+		    NEXT_STATE.REGS[rd] = CURRENT_STATE.PC + 8;
+		    NEXT_STATE.PC = CURRENT_STATE.REGS[rs];
+                    break;                
+		case 0b000000:        //SLL
 
                     break;
 
