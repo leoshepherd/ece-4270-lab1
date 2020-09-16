@@ -128,7 +128,7 @@ void mdump(uint32_t start, uint32_t stop) {
 /***************************************************************/
 /* Dump current values of registers to the teminal                                              */   
 /***************************************************************/
-void rdump() {                               
+void rdump() {                              
 	int i; 
 	printf("-------------------------------------\n");
 	printf("Dumping Register Content\n");
@@ -300,409 +300,227 @@ void load_program() {
 	fclose(fp);
 }
 
+
 /************************************************************/
 /* decode and execute instruction                                                                     */ 
 /************************************************************/
 void handle_instruction()
 {
-
-	//**Binary Decoder//
-	//PROGRAM_SIZE is the number of things in file
-	
-
-	/*	printf("Program size is: %d\n", PROGRAM_SIZE);
-	int sizeholder = 0;
-	int sizeholder = PROGRAM_SIZE;
-
-
-	int * jagged[PROGRAM_SIZE];
-	*/
-	int wholehex = 0;
-	int hex1 = 0;
-	int hex2 = 0;
-	int hex3 = 0;
-	int hex4 = 0;
-	int hex5 = 0;
-	int hex6 = 0;
-	int hex7 = 0;
-	int hex8 = 0;
-
-	wholehex = mem_read_32(0x00400000);	//use this to grab the value in memory
-
-	hex1 = wholehex >>28;
-	hex2 = (wholehex>>24) & (0x0000000F);
-	hex3 = (wholehex>>20) & (0x0000000F); 
-	hex4 = (wholehex>>16) & (0x0000000F); 
-	hex5 = (wholehex>>12) & (0x0000000F); 
-	hex6 = (wholehex>>8) & (0x0000000F); 
-	hex7 = (wholehex>>4) & (0x0000000F); 
-	hex8 = (wholehex>>0) & (0x0000000F); 
-
-	printf("%x\n", wholehex);
-
-	printf("%x\n", hex1);
-	printf("%x\n", hex2);
+	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
+	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;     	//get op code of instruction
+	    uint32_t funct = (current_inst & 0x1f);           	      	//get function code of instruction 
+	    uint32_t rs = (current_inst & 0x3E00000) >> 21;	//get rs register of instruction
+            uint32_t rt = (current_inst & 0x1F0000) >> 16;		//get rt register of instruction
+            uint32_t rd = (current_inst & 0xF800) >> 11;		//get desination register of instruction
+	    uint32_t target = (current_inst & 0x3FFFFFF);		//get target register
+	    uint32_t immediate = (current_inst & 0xffff);		//get immediate value
+	    uint32_t shift = (current_inst >> 6) & 0x1F;
 
 
-	//Identify Function//
+	if(op_code == 0b000000){
+            switch(funct)
+		{
+                case 0b100000:        //ADD
+		    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + CURRENT_STATE.REGS[rs];
+                    break;
+
+                case 0b100001:        //ADDU
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + CURRENT_STATE.REGS[rs];
+                    break;
+
+                case 0b100100:        //AND
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] & CURRENT_STATE.REGS[rs];
+                    break;
+
+                case 0b100010:        //SUB
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] - CURRENT_STATE.REGS[rt];
+                    break;
+
+                case 0b100011:        //SUBU
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] - CURRENT_STATE.REGS[rt];
+                    break;
+
+                case 0b011000:        //MULT
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] * CURRENT_STATE.REGS[rs];
+                    break;
+
+                case 0b011001:        //MULTU
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] * CURRENT_STATE.REGS[rs];
+                    break;
+
+                case 0b011010:        //DIV
+                    if (CURRENT_STATE.REGS[rt] != 0){
+                        NEXT_STATE.HI = CURRENT_STATE.REGS[rs] / CURRENT_STATE.REGS[rt];
+                        NEXT_STATE.LO = CURRENT_STATE.REGS[rs] % CURRENT_STATE.REGS[rt];
+
+                    }
+                    else{
+                        printf("ERROR: result undefined, zero devisor");
+                    }
+                    break;
+
+                case 0b011011:        //DIVU
+                    if (CURRENT_STATE.REGS[rt] != 0){
+                        NEXT_STATE.HI = CURRENT_STATE.REGS[rs] / CURRENT_STATE.REGS[rt];
+			NEXT_STATE.LO = CURRENT_STATE.REGS[rs] % CURRENT_STATE.REGS[rt];
+
+                    }
+                    else{
+                        printf("ERROR: result undefined, zero devisor");
+                    }
+                    break;
+                
+                case 0b100101:        //OR
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] | CURRENT_STATE.REGS[rs];
+                    break;
+
+                case 0b100110:        //XOR
+                    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] ^ CURRENT_STATE.REGS[rs];
+                    break;
+
+                case 0b100111:        //NOR
+                    NEXT_STATE.REGS[rd] = ~(CURRENT_STATE.REGS[rt] | CURRENT_STATE.REGS[rs]);
+                    break;
+
+		    
+                case 0b101010:        //SLT
+		    if (CURRENT_STATE.REGS[rs] < CURRENT_STATE.REGS[rt]){
+			NEXT_STATE.REGS[rd] = 1;
+		    }
+		    else{
+			NEXT_STATE.REGS[rd] = 0;
+		    }
+                    break;
+
+                case 0b001000:        //JR
+		    NEXT_STATE.PC = CURRENT_STATE.REGS[rs];
+                    break;
+
+                case 0b001001:        //JALR
+		    NEXT_STATE.REGS[rd] = CURRENT_STATE.PC + 8;
+		    NEXT_STATE.PC = CURRENT_STATE.REGS[rs];
+                    break;                
+		case 0b000000:        //SLL
+	   		NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] <<shift;
+                    break;
+
+                case 0b000010:        //SRL
+		   	NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] >>shift;
+                    break;
+
+                case 0b000011:        //SRA
+			NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] >>shift;
+                    break;
+
+                case 0b010000:        //MFHI
+			NEXT_STATE.REGS[rd] = CURRENT_STATE.HI;
+                    break;
+
+                case 0b010010:        //MFLO
+			NEXT_STATE.REGS[rd] = CURRENT_STATE.LO;
+                    break;
+
+                case 0b010001:        //MTHI
+			NEXT_STATE.HI = CURRENT_STATE.REGS[rs];
+                    break;
+
+                case 0b010011:        //MTLO
+			NEXT_STATE.REGS[rd] = CURRENT_STATE.LO;
+                    break;
 		
-	if((hex1 == 0x0) && (hex2 < 0x4))		//yellow
-	{
+       		}
+		
+}	
 
-		if(hex2 > 0x3 && hex2 <0x8)	//4-7
-		{
-			if(hex4 ==0)
-			{
-				//BLTZ
-			}	
-			if(hex4 ==1)
-			{
-				//BGEZ
-			}
-			else
-			{
-				printf("not a given function\n");
-			}
-				
-		}
-		else if( hex2> 0x7 )			//8-F
-		{
-			if(hex2 < 0xC)
-			{
-					//J Instruction
-			}
-			else
-			{
-					//JAL Instruction
-			}
-			
-		}
-		else				//0-3
-		{
+	else{
 
-			if(hex8 == 0x0)
-			{
-				if((hex7 == 0x0) || (hex7 == 0x4) || (hex7 == 0x8) || (hex7 == 0xC))
-				{
-					//SLL
-				}
-				if((hex7 == 0x1) || (hex7 == 0x5) || (hex7 == 0x9) || (hex7 == 0xD))
-				{
-					//MFHI
-				}
-				if((hex7 == 0x2) || (hex7 == 0x6) || (hex7 == 0xA) || (hex7 == 0xE))
-				{
-					//MFHI
-				}
-				else
-				{
-					printf("not a valid function");
-				}
-			}
+	switch (op_code){
+        case 0b001000:                //ADDI
 
-			if(hex8 == 0x1)
-			{
-				if((hex7 == 0x1) || (hex7 == 0x5) || (hex7 == 0x9) || (hex7 == 0xD))
-				{
-					//MTHI
-				}
-				if((hex7 == 0x2) || (hex7 == 0x6) || (hex7 == 0xA) || (hex7 == 0xE))
-				{
-					//ADDU
-				}
-				else
-				{
-					printf("not a valid function");
-				}
-			}
-			if(hex8 == 0x2)
-			{
-				if((hex7 == 0x0) || (hex7 == 0x4) || (hex7 == 0x8) || (hex7 == 0xC))
-				{
-					//SRL
-				}
-				if((hex7 == 0x1) || (hex7 == 0x5) || (hex7 == 0x9) || (hex7 == 0xD))
-				{
-					//MFLO
-				}
-				if((hex7 == 0x2) || (hex7 == 0x6) || (hex7 == 0xA) || (hex7 == 0xE))
-				{
-					//SUB
-				}
-				else
-				{
-					printf("not a valid function");
-				}
-			}
+            break;
 
-			if(hex8 == 0x3)
-			{
-				if((hex7 == 0x0) || (hex7 == 0x4) || (hex7 == 0x8) || (hex7 == 0xC))
-				{
-					//SRA
-				}
-				if((hex7 == 0x1) || (hex7 == 0x5) || (hex7 == 0x9) || (hex7 == 0xD))
-				{
-					//MTLO
-				}
-				if((hex7 == 0x2) || (hex7 == 0x6) || (hex7 == 0xA) || (hex7 == 0xE))
-				{
-					//SUBU
-				}
-				else
-				{
-					printf("not a valid function");
-				}
-			}
-			if(hex8 == 0x4)
-			{
-				if((hex7 == 0x2) || (hex7 == 0x6) || (hex7 == 0xA) || (hex7 == 0xE))
-				{
-					//AND
-				}
-				else
-				{
-					printf("invalid function");
-				}
+        case 0b001001:                //ADDIU
 
-			}
-			if(hex8 == 0x5)
-			{
-				if((hex7 == 0x2) || (hex7 == 0x6) || (hex7 == 0xA) || (hex7 == 0xE))
-				{
-					//OR
-				}
-				else
-				{
-					printf("invalid function");
-				}
+            break;
 
-			}
-			if(hex8 == 0x6)
-			{
-				if((hex7 == 0x2) || (hex7 == 0x6) || (hex7 == 0xA) || (hex7 == 0xE))
-				{
-					//XOR
-				}
-				else
-				{
-					printf("invalid function");
-				}
+        case 0b001100:                //ANDI
 
-			}
-			if(hex8 == 0x7)
-			{
-				if((hex7 == 0x2) || (hex7 == 0x6) || (hex7 == 0xA) || (hex7 == 0xE))
-				{
-					//NOR
-				}
-				else
-				{
-					printf("invalid function");
-				}
+            break;
 
-			}
+        case 0b001101:                //ORI
 
-			if(hex8 == 0x8)
-			{
-				if((hex7 == 0x1) || (hex7 == 0x5) || (hex7 == 0x9) || (hex7 == 0xD))
-				{
-					//MULT
-				}
-				if((hex7 == 0x0) || (hex7 == 0x4) || (hex7 == 0x8) || (hex7 == 0xC))
-				{
-					//JR
-				}
-				else
-				{
-					printf("not a valid function");
-				}
-			}
-			if(hex8 == 0x9)
-			{
-				if((hex7 == 0x1) || (hex7 == 0x5) || (hex7 == 0x9) || (hex7 == 0xD))
-				{
-					//MULTU
-				}
-				if((hex7 == 0x0) || (hex7 == 0x4) || (hex7 == 0x8) || (hex7 == 0xC))
-				{
-					//JALR
-				}
-				else
-				{
-					printf("not a valid function");
-				}
-			}
-			if(hex8 == 0xA)
-			{
-				if((hex7 == 0x1) || (hex7 == 0x5) || (hex7 == 0x9) || (hex7 == 0xD))
-				{
-					//DIV
-				}
-				if((hex7 == 0x2) || (hex7 == 0x6) || (hex7 == 0xA) || (hex7 == 0xE))
-				{
-					//SLT
-				}
-				else
-				{
-					printf("not a valid function");
-				}
-			}
-			if(hex8 == 0xB)
-			{
-				if((hex7 == 0x1) || (hex7 == 0x5) || (hex7 == 0x9) || (hex7 == 0xD))
-				{
-					//DIVU
-				}
-				else
-				{
-					printf("invalid function");
-				}
-			}
-			if(hex8 == 0xC)
-			{
-				if((hex7 == 0x0) || (hex7 == 0x4) || (hex7 == 0x8) || (hex7 == 0xC))
-				{
-					//SYSCALL
-				}
-				else
-				{
-					printf("invalid function");
-				}
-			}
+            break;
 
+        case 0b001110:                //XORI
 
-		}
+            break;
 
+        case 0b001010:                //SLTI
+            
 
-	}
-	else if(hex1 == 0x1)	//orange
-	{
-		if(hex2 <0x4)
-		{
-				//BEQ
-		}
-		if(hex2>0x3 && hex2 <0x8)
-		{
-				//BNE
-		}
-		if(hex2>0x7 && hex2<0xC)
-		{
-				//BLEZ
-		}
-		else
-		{
-				//BGTZ
-		}
+            break;
 
+        case 0b000010:                //J
 
-	}
-	else if((hex1 == 0x2) && ((hex2 < 0x4) || (hex2 > 0x7))) //red
-	{
-			printf("found\n");
+            break;
 
-			if(hex2 < 0x4)
-			{
-				//ADDI
-			}
-			else
-			{
-				//SLTI
-			}
-	
-	}
-	else if(hex1 == 0x3)	//purp
-	{
-		if(hex2 <0x4)
-		{
-				//ANDI
-		}
-		if(hex2>0x3 && hex2 <0x8)
-		{
-				//ORI
-		}
-		if(hex2>0x7 && hex2<0xC)
-		{
-				//XORI
-		}
-		else
-		{
-				//LUI
-		}
+        case 0b000011:                //JAL
 
-	}
-	else if(hex1 == 0x8 && ( (hex2 < 0x8) || ( hex2 > 0xB) )) //blue
-	{
-		if(hex2 <0x4)
-		{
-				//LB
-		}
-		if(hex2>0x3 && hex2 <0x8)
-		{
-				//LH
-		}
-		if(hex2>0xB)
-		{
-				//LW
-		}
-		else
-		{
-				printf("Not a given function");
-		}
+            break;
 
-	}
-	else if(hex1 == 0xA && ( (hex2 <0x8) || (hex2 > 0xB) ))	//green
-	{
-		if(hex2 <0x4)
-		{
-				//SB
-		}
-		if(hex2>0x3 && hex2 <0x8)
-		{
-				//SH
-		}
-		if(hex2>0xB)
-		{
-				//SW
-		}
-		else
-		{
-				printf("Not a given function");
-		}
+        case 0b100011:                //LW
 
+            break;
 
-	}
-	else
-	{
-		printf("not a valid function\n");
-	}
+        case 0b100000:                //LB
 
-	
- 
-	
-	
-	
+            break;
 
+        case 0b100001:                //LH
 
+            break;
 
-	//Convert to Binary// (new function)
-	
-	//pointer to and array and pass it to a function to fill it the array and pass it back	
-	
-	
+        case 0b001111:                //LUI
 
-	//Move data around  in registers ( new function)
+            break;
 
+        case 0b101011:                //SW
 
+            break;
 
+        case 0b101000:                //SB
 
-	/*IMPLEMENT THIS*/
-	/* execute one instruction at a time. Use/update CURRENT_STATE and and NEXT_STATE, as necessary.*/
+            break;
+
+        case 0b101001:                //SH
+
+            break;
+
+        case 0b000100:                //BEQ
+
+            break;
+
+        case 0b000101:                //BNE
+
+            break;
+
+        case 0b000110:                //BLEZ
+
+            break; 
+        case 0b000001:
+            if (funct == 0b00000){}        //BLTZ
+                else{}            //BGEZ
+
+            break;
+
+        case 0b000111:                //BGTZ
+
+            break;
 }
 
-
-
-
+}	/*IMPLEMENT THIS*/
+	/* execute one instruction at a time. Use/update CURRENT_STATE and and NEXT_STATE, as necessary.*/
+}
 
 
 /************************************************************/
@@ -733,6 +551,7 @@ void print_program(){
 /* Print the instruction at given memory address (in MIPS assembly format)    */
 /************************************************************/
 void print_instruction(uint32_t addr){
+	printf("%lu", (unsigned long)CURRENT_STATE.REGS[addr]);
 	/*IMPLEMENT THIS*/
 }
 
