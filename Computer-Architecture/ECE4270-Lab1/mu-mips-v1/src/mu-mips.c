@@ -305,187 +305,216 @@ void load_program() {
 /************************************************************/
 void handle_instruction()
 {
-	uint32_t current_inst = mem_read_32(CURRENT_STATE.REGS);
-	int op_code = (current_inst & 0xFC000000) >> 28;
-	int funct = (current_inst & 0x1f);
+	    uint32_t current_inst = mem_read_32(*CURRENT_STATE.REGS);
+	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;
+	    uint32_t funct = (current_inst & 0x1f);           
+	    uint32_t rs_temp = (current_inst & 0x3E00000) >> 21;
+            uint32_t rt_temp = (current_inst & 0x1F0000) >> 16;
+            uint32_t rd_temp = (current_inst & 0xF800) >> 11;
+            uint32_t rs = mem_read_32(rs_temp);
+            uint32_t rt = mem_read_32(rt_temp);
+            uint32_t rd;
+
+	if(op_code == 0b000000){
+            switch(funct)
+		{
+                case 0b100000:        //ADD
+                    rd = rt + rs;
+                    mem_write_32(rd_temp, rd);
+                    break;
+
+                case 0b100001:        //ADDU
+                    rd = rt + rs;
+                    mem_write_32(rd_temp, rd);
+                    break;
+
+                case 0b100100:        //AND
+                    rd = rt & rs;
+                    mem_write_32(rd_temp, rd);
+                    break;
+
+                case 0b100010:        //SUB
+                    rd = rs - rt;
+                    mem_write_32(rd_temp, rd);
+                    break;
+
+                case 0b100011:        //SUBU
+                    rd = rs - rt;
+                    mem_write_32(rd_temp, rd);
+                    break;
+
+                case 0b011000:        //MULT
+                    rd = rs * rt;
+                    mem_write_32(rd_temp,rd);
+                    break;
+
+                case 0b011001:        //MULTU
+                    rd = rs * rt;
+                    mem_write_32(rd_temp,rd);
+                    break;
+
+                case 0b011010:        //DIV
+                    if (rt != 0){
+                        uint32_t temp = rs / rt;
+                        mem_write_32(CURRENT_STATE.HI, temp);
+                    }
+                    else{
+                        printf("ERROR: result udefined, zero devisor");
+                    }
+                    break;
+
+                case 0b011011:        //DIVU
+                    if (rt != 0){
+                        uint32_t temp = rs / rt;
+                        mem_write_32(CURRENT_STATE.HI, temp);
+                    break;
+
+                
+                case 0b100101:        //OR
+                    rd = rt || rs;
+                    mem_write_32(rd_temp, rd);
+                    break;
+
+                case 0b100110:        //XOR
+                        
+                    break;
+
+                case 0b100111:        //NO
+                    rd = !(rt || rs);
+                    mem_write_32(rd_temp, rd);
+                    break;
+
+                case 0b101010:        //SLT
+
+                    break;
+
+                case 0b001000:        //JR
+
+                    break;
+
+                case 0b001001:        //JALR
+
+                    break;
+
+                case 0b000000:        //SLL
+
+                    break;
+
+                case 0b000010:        //SRL
+
+                    break;
+
+                case 0b000011:        //SRA
+
+                    break;
+
+                case 0b010000:        //MFHI
+
+                    break;
+
+                case 0b010010:        //MFLO
+
+                    break;
+
+                case 0b010001:        //MTHI
+
+                    break;
+
+                case 0b010011:        //MTLO
+
+                    break;
+		
+       		}
+		}
+}	
+
+	else{
+
 	switch (op_code){
-		case '000000':
-			int rs = (current_inst & 0x3E00000) >> 21;
-			int rt; = (current_inst & 0x1F0000) >> 16;
-			int rd; = (current_inst & 0xF800) >> 11;
-			switch(funct){
-				case '100000'		//ADD
-					&rd = &rt + &rs;
-					break;
+        case 0b001000:                //ADDI
 
-				case '100001'		//ADDU
-					&rd = &rt + &rs;
-					break;
+            break;
 
-				case '100100'		//AND
-					break;
+        case 0b001001:                //ADDIU
 
-				case '100010'		//SUB
+            break;
 
-					break;
+        case 0b001100:                //ANDI
 
-				case '100011'		//SUBU
+            break;
 
-					break;
+        case 0b001101:                //ORI
 
-				case '011000'		//MULT
+            break;
 
-					break;
+        case 0b001110:                //XORI
 
-				case '011001'		//MULTU
+            break;
 
-					break;
+        case 0b001010:                //SLTI
+            
 
-				case '011010'		//DIV
+            break;
 
-					break;
+        case 0b000010:                //J
 
-				case '011011'		//DIVU
+            break;
 
-					break;
+        case 0b000011:                //JAL
 
-				case '100101'		//OR
+            break;
 
-					break;
+        case 0b100011:                //LW
 
-				case '100110'		//XOR
+            break;
 
-					break;
+        case 0b100000:                //LB
 
-				case '100111'		//NOR
+            break;
 
-					break;
+        case 0b100001:                //LH
 
-				case '101010'		//SLT
+            break;
 
-					break;
+        case 0b001111:                //LUI
 
-				case '001000'		//JR
+            break;
 
-					break;
+        case 0b101011:                //SW
 
-				case '001001'		//JALR
+            break;
 
-					break;
+        case 0b101000:                //SB
 
-				case '000000'		//SLL
+            break;
 
-					break;
+        case 0b101001:                //SH
 
-				case '000010'		//SRL
+            break;
 
-					break;
+        case 0b000100:                //BEQ
 
-				case '000011'		//SRA
+            break;
 
-					break;
+        case 0b000101:                //BNE
 
-				case '010000'		//MFHI
+            break;
 
-					break;
+        case 0b000110:                //BLEZ
 
-				case '010010'		//MFLO
+            break;
 
-					break;
+        case 0b000001:
+            if (funct == 0b00000){}        //BLTZ
+                else{}            //BGEZ
 
-				case '010001'		//MTHI
+            break;
 
-					break;
+        case 0b000111:                //BGTZ
 
-				case '010011'		//MTLO
-
-					break;
-
-			}
-			break;
-		case '001000':				//ADDI
-
-			break;
-
-		case '001001':				//ADDIU
-
-			break;
-
-		case '001100':				//ANDI
-
-			break;
-
-		case '001101':				//ORI
-
-			break;
-
-		case '001110':				//XORI
-
-			break;
-
-		case '001010':				//SLTI
-
-			break;
-
-		case '000010':				//J
-
-			break;
-
-		case '000011':				//JAL
-
-			break;
-
-		case '100011':				//LW
-
-			break;
-
-		case '100000':				//LB
-
-			break;
-
-		case '100001':				//LH
-
-			break;
-
-		case '001111':				//LUI
-
-			break;
-
-		case '101011':				//SW
-
-			break;
-
-		case '101000':				//SB
-
-			break;
-
-		case '101001':				//SH
-
-			break;
-
-		case '000100':				//BEQ
-
-			break;
-
-		case '000101':				//BNE
-
-			break;
-
-		case '000110':				//BLEZ
-
-			break;
-
-		case '000001':
-			if (funct == 00000){}		//BLTZ
-				else{}			//BGEZ
-
-			break;
-
-		case '000111':				//BGTZ
-
-			break;
-	}
-	/*IMPLEMENT THIS*/
+            break;
+}
+}	/*IMPLEMENT THIS*/
 	/* execute one instruction at a time. Use/update CURRENT_STATE and and NEXT_STATE, as necessary.*/
 }
 
