@@ -337,7 +337,7 @@ void handle_instruction()
 
                 case 0b100011:        //SUBU
                     NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rs] - CURRENT_STATE.REGS[rt];
-                                        break;
+                    break;
 
                 case 0b011000:        //MULT
                     NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] * CURRENT_STATE.REGS[rs];
@@ -348,8 +348,10 @@ void handle_instruction()
                     break;
 
                 case 0b011010:        //DIV
-                    if (rt != 0){
+                    if (CURRENT_STATE.REGS[rt] != 0){
                         NEXT_STATE.HI = CURRENT_STATE.REGS[rs] / CURRENT_STATE.REGS[rt];
+                        NEXT_STATE.LO = CURRENT_STATE.REGS[rs] % CURRENT_STATE.REGS[rt];
+
                     }
                     else{
                         printf("ERROR: result undefined, zero devisor");
@@ -357,8 +359,10 @@ void handle_instruction()
                     break;
 
                 case 0b011011:        //DIVU
-                    if (rt != 0){
+                    if (CURRENT_STATE.REGS[rt] != 0){
                         NEXT_STATE.HI = CURRENT_STATE.REGS[rs] / CURRENT_STATE.REGS[rt];
+			NEXT_STATE.LO = CURRENT_STATE.REGS[rs] % CURRENT_STATE.REGS[rt];
+
                     }
                     else{
                         printf("ERROR: result undefined, zero devisor");
@@ -377,6 +381,7 @@ void handle_instruction()
                     NEXT_STATE.REGS[rd] = ~(CURRENT_STATE.REGS[rt] | CURRENT_STATE.REGS[rs]);
                     break;
 
+		    A
                 case 0b101010:        //SLT
 		    if (CURRENT_STATE.REGS[rs] < CURRENT_STAE.REGS[rt]){
 			NEXT_STATE.REGS[rd] = 1;
@@ -384,7 +389,6 @@ void handle_instruction()
 		    else{
 			NEXT_STATE.REGS[rd] = 0;
 		    }
-		    mem_write_32(rd_temp, rd);
                     break;
 
                 case 0b001000:        //JR
