@@ -104,6 +104,7 @@ void runAll() {
 
 	printf("Simulation Started...\n\n");
 	while (RUN_FLAG){
+		A
 		cycle();
 	}
 	printf("Simulation Finished.\n\n");
@@ -129,6 +130,7 @@ void mdump(uint32_t start, uint32_t stop) {
 /* Dump current values of registers to the teminal                                              */   
 /***************************************************************/
 void rdump() {                               
+	B
 	int i; 
 	printf("-------------------------------------\n");
 	printf("Dumping Register Content\n");
@@ -305,13 +307,15 @@ void load_program() {
 /************************************************************/
 void handle_instruction()
 {
-	    uint32_t current_inst = mem_read_32(*CURRENT_STATE.REGS);
-	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;
-	    uint32_t funct = (current_inst & 0x1f);           
-	    uint32_t rs_temp = (current_inst & 0x3E00000) >> 21;
-            uint32_t rt_temp = (current_inst & 0x1F0000) >> 16;
-            uint32_t rd_temp = (current_inst & 0xF800) >> 11;
-            uint32_t rs = mem_read_32(rs_temp);
+	    uint32_t current_inst = mem_read_32(*CURRENT_STATE); 	//get current instruction
+	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;     	//get op code of instruction
+	    uint32_t funct = (current_inst & 0x1f);           	      	//get function code of instruction 
+	    uint32_t rs_temp = (current_inst & 0x3E00000) >> 21;	//get rs register of instruction
+            uint32_t rt_temp = (current_inst & 0x1F0000) >> 16;		//get rt register of instruction
+            uint32_t rd_temp = (current_inst & 0xF800) >> 11;		//get desination register of instruction
+	    uint32_t target = (current_inst & 0x3FFFFFF);		//get target register
+	    uint32_t immediate = (current_inst & 0xffff);		//get immediate value
+            uint32_t rs = mem_read_32(rs_temp);				//extract data from registers
             uint32_t rt = mem_read_32(rt_temp);
             uint32_t rd;
 
@@ -351,6 +355,7 @@ void handle_instruction()
                 case 0b011001:        //MULTU
                     rd = rs * rt;
                     mem_write_32(rd_temp,rd);
+		    B
                     break;
 
                 case 0b011010:        //DIV
@@ -376,20 +381,27 @@ void handle_instruction()
                     break;
 
                 case 0b100110:        //XOR
-                        
+                    rd = rs ^ rt;
+		    mem_write_32(rd_temp, rd);
                     break;
 
-                case 0b100111:        //NO
+                case 0b100111:        //NOR
                     rd = !(rt || rs);
                     mem_write_32(rd_temp, rd);
                     break;
 
                 case 0b101010:        //SLT
-
+		    if (rs < rt){
+			rd = 1;
+		    }
+		    else{
+			rd = 0;
+		    }
+		    mem_write_32(rd_temp, rd);
                     break;
 
                 case 0b001000:        //JR
-
+		    NEXT_STATE = rs;
                     break;
 
                 case 0b001001:        //JALR
