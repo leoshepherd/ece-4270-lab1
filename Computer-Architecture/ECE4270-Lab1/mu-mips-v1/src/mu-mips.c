@@ -513,6 +513,7 @@ void handle_instruction()
 
             break;
 }
+B
 }	/*IMPLEMENT THIS*/
 	/* execute one instruction at a time. Use/update CURRENT_STATE and and NEXT_STATE, as necessary.*/
 }
@@ -546,6 +547,7 @@ void print_program(){
 /* Print the instruction at given memory address (in MIPS assembly format)    */
 /************************************************************/
 void print_instruction(uint32_t addr){
+	printf("%lu", (unsigned long)CURRENT_STATE.REGS[addr]);
 	/*IMPLEMENT THIS*/
 }
 
