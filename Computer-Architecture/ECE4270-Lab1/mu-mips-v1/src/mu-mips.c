@@ -484,7 +484,9 @@ void handle_instruction()
             break;
 
         case 0b000010:                //J
-
+	    temp = target << 2;
+	    temp2 = CURRENT_STATE.PC & 0xE0000000;
+	    NEXT_STATE.PC = temp2 || temp;
             break;
 
         case 0b000011:                //JAL
