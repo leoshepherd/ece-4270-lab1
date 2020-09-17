@@ -352,7 +352,6 @@ void handle_instruction()
                     if (CURRENT_STATE.REGS[rt] != 0){
                         NEXT_STATE.HI = CURRENT_STATE.REGS[rs] / CURRENT_STATE.REGS[rt];
                         NEXT_STATE.LO = CURRENT_STATE.REGS[rs] % CURRENT_STATE.REGS[rt];
-
                     }
                     else{
                         printf("ERROR: result undefined, zero devisor");
@@ -436,7 +435,14 @@ void handle_instruction()
 
 	switch (op_code){
         case 0b001000:                //ADDI
-
+	    uint32_t temp2 = (immediate & 0x8000) << 16;
+	    uint32_t temp = 0x00000000;
+			for(int i =0; i<17; i++)
+			{
+			temp & temp2;
+			temp >> 1;
+			}
+	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + temp;
             break;
 
         case 0b001001:                //ADDIU
