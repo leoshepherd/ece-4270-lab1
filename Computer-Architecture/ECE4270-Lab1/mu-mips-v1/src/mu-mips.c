@@ -306,7 +306,7 @@ void load_program() {
 /************************************************************/
 void handle_instruction()
 {
-	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
+	    uint32_t current_inst = (CURRENT_STATE.PC); 	//get current instruction
 	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;     	//get op code of instruction
 	    uint32_t funct = (current_inst & 0x1f);           	      	//get function code of instruction 
 	    uint32_t rs = (current_inst & 0x3E00000) >> 21;	//get rs register of instruction
@@ -442,7 +442,7 @@ void handle_instruction()
 			for(int i =0; i<17; i++)
 			{
 			temp = temp & temp2;
-			temp >> 1;
+			temp = temp >> 1;
 			}
 	    temp = temp & immediate;
 	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + temp;
@@ -454,7 +454,7 @@ void handle_instruction()
 			for(int i =0; i<17; i++)
 			{
 			temp = temp & temp2;
-			temp >> 1;
+			temp = temp >> 1;
 			}
 	    temp = temp & immediate;
 	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + temp;
@@ -484,6 +484,9 @@ void handle_instruction()
 
         case 0b000011:                //JAL
 
+		temp = target;
+		NEXT_STATE.REGS[31] = CURRENT_STATE.PC +8;
+
             break;
 
         case 0b100011:                //LW
@@ -495,11 +498,13 @@ void handle_instruction()
             break;
 
         case 0b100001:                //LH
+	
+	
 
             break;
 
         case 0b001111:                //LUI
-	    
+	   	NEXT_STATE.REGS[rt] = immediate;
 
             break;
 
@@ -517,29 +522,162 @@ void handle_instruction()
 
         case 0b000100:                //BEQ
 
-	    
+	   	
+	        temp = 0x00000000;
+		temp2 = offset & 0x8000 << 16;
+
+			for(int i =0; i<15; i++)
+			{
+				temp = temp & temp2;
+				temp = temp >> 1;
+			}
+		
+		
+			temp = temp & offset;
+			temp = temp << 2 ;
+
+			target = temp;
+
+
+		if(CURRENT_STATE.REGS[rs] == CURRENT_STATE.REGS[rt] )
+		{
+			NEXT_STATE.PC = CURRENT_STATE.PC + target;
+		}
+
+		else
+		{
+
+			break;
+		}
+
             break;
 
         case 0b000101:                //BNE
+
+		temp = 0x00000000;
+		 temp2 = offset & 0x8000 << 16;
+
+			for(int i =0; i<15; i++)
+			{
+				temp = temp & temp2;
+				temp = temp >> 1;
+			}
+		
+		
+			temp = temp & offset;
+			temp = temp << 2 ;
+
+			target = temp;
+
+
+		if(CURRENT_STATE.REGS[rs] != CURRENT_STATE.REGS[rt] )
+		{
+			NEXT_STATE.PC = CURRENT_STATE.PC + target;
+		}
+
+		else
+		{
+
+			break;
+		}
 
             break;
 
         case 0b000110:                //BLEZ
 
+		temp = 0x00000000;
+		 temp2 = offset & 0x8000 << 16;
+
+			for(int i =0; i<15; i++)
+			{
+				temp = temp & temp2;
+				temp = temp >> 1;
+			}
+		
+		
+			temp = temp & offset;
+			temp = temp << 2 ;
+
+			target = temp;
+
+
+		if(((CURRENT_STATE.REGS[rs]<<1) == 1) || (CURRENT_STATE.REGS[rs] == 0 ))
+		{
+			NEXT_STATE.PC = CURRENT_STATE.PC + target;
+		}
+
+		else
+		{
+
+			break;
+		}
+
+
             break; 
         case 0b000001:
-            if (funct == 0b00000)
+            if (funct == 0b00000)	//BLTZ
 	    {
 
+		 temp = 0x00000000;
+		 temp2 = offset & 0x8000 << 16;
+
+			for(int i =0; i<15; i++)
+			{
+				temp = temp & temp2;
+				temp = temp >> 1;
+			}
+		
+		
+			temp = temp & offset;
+			temp = temp << 2 ;
+
+			target = temp;
+
+
+		if(((CURRENT_STATE.REGS[rs]<<1) == 1))
+		{
+			NEXT_STATE.PC = CURRENT_STATE.PC + target;
+		}
+
+		else
+		{
+
+			break;
+		}
 
 
 	    
-	    }        //BLTZ
+	    }       
 
-            else
+            else	//BGEZ
 	    {
+	         temp = 0x00000000;
+		 temp2 = offset & 0x8000 << 16;
+
+			for(int i =0; i<15; i++)
+			{
+				temp = temp & temp2;
+				temp = temp >> 1;
+			}
 		
-	    }            //BGEZ
+		
+			temp = temp & offset;
+			temp = temp << 2 ;
+
+			target = temp;
+
+
+		if(((CURRENT_STATE.REGS[rs]<<1) == 0))
+		{
+			NEXT_STATE.PC = CURRENT_STATE.PC + target;
+		}
+
+		else
+		{
+
+			break;
+		}
+	}        
 
             break;
 
@@ -547,21 +685,24 @@ void handle_instruction()
 		 temp = 0x00000000;
 		 temp2 = offset & 0x8000 << 16;
 
-		if(CURRENT_STATE.REGS[rs] != 0)
-		{
-
 			for(int i =0; i<15; i++)
 			{
-			temp = temp & temp2;
-			temp >> 1;
+				temp = temp & temp2;
+				temp = temp >> 1;
 			}
 		
 		
 			temp = temp & offset;
-			temp << 2 ;
+			temp = temp << 2 ;
 
-			NEXT_STATE.PC = temp;
-			}
+			target = temp;
+
+
+		if(( CURRENT_STATE.REGS[rs] & 0x8000000) == 0 && (CURRENT_STATE.REGS[rs]<<1) != 0 )
+		{
+			NEXT_STATE.PC = CURRENT_STATE.PC + target;
+		}
+
 		else
 		{
 
