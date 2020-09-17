@@ -552,7 +552,7 @@ void handle_instruction()
 
 			for(int i =0; i<15; i++)
 			{
-			temp & temp2;
+			temp = temp & temp2;
 			temp >> 1;
 			}
 		
