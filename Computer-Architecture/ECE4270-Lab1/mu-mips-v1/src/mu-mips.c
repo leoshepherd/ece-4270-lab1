@@ -448,7 +448,15 @@ void handle_instruction()
             break;
 
         case 0b001001:                //ADDIU
-
+	    uint32_t temp2 = (immediate & 0x8000) << 16;
+	    uint32_t temp = 0x00000000;
+			for(int i =0; i<17; i++)
+			{
+			temp & temp2;
+			temp >> 1;
+			}
+	    temp = temp & immediate;
+	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + temp;
             break;
 
         case 0b001100:                //ANDI
