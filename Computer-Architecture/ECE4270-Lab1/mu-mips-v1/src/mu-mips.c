@@ -487,10 +487,12 @@ void handle_instruction()
 
         case 0b000011:                //JAL
 
+		temp2 = CURRENT_STATE.PC & 0xE0000000;
 		temp = target;
+		temp = temp << 2;
 		NEXT_STATE.REGS[31] = CURRENT_STATE.PC +8;
-
-            break;
+		NEXT_START.PC = temp2 || temp;            
+		break;
 
         case 0b100011:                //LW
 
