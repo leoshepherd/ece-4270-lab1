@@ -461,11 +461,11 @@ void handle_instruction()
             break;
 
         case 0b001100:                //ANDI
-
+	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] & immediate;
             break;
 
         case 0b001101:                //ORI
-
+	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] || immediate;
             break;
 
         case 0b001110:                //XORI
