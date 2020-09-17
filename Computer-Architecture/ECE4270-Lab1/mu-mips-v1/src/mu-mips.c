@@ -306,21 +306,21 @@ void load_program() {
 /************************************************************/
 void handle_instruction()
 {
-	    uint32_t current_inst = (CURRENT_STATE.PC); 	//get current instruction
-	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;     	//get op code of instruction
-	    uint32_t funct = (current_inst & 0x1f);           	      	//get function code of instruction 
-	    uint32_t rs = (current_inst & 0x3E00000) >> 21;	//get rs register of instruction
-            uint32_t rt = (current_inst & 0x1F0000) >> 16;		//get rt register of instruction
-            uint32_t rd = (current_inst & 0xF800) >> 11;		//get desination register of instruction
-	    uint32_t target = (current_inst & 0x3FFFFFF);		//get target register
-	    uint32_t immediate = (current_inst & 0xffff);		//get immediate value
-	    uint32_t shift = (current_inst >> 6) & 0x1F;
-	    uint32_t offset = (current_inst & 0xFFFF);
-  	    uint32_t temp = 0x00000000;
-	    uint32_t temp2 = offset & 0x8000 << 16;
+	
+	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
+	    uint32_t op_code = bit_flip((current_inst & 0xFC000000) >> 28);     	//get op code of instruction
+	    uint32_t funct = bit_flip(current_inst & 0x1f);           	      	//get function code of instruction 
+	    uint32_t rs = bit_flip((current_inst & 0x3E00000) >> 21);		//get rs register of instruction
+            uint32_t rt = bit_flip((current_inst & 0x1F0000) >> 16);		//get rt register of instruction
+            uint32_t rd = bit_flip((current_inst & 0xF800) >> 11);		//get desination register of instruction
+	    uint32_t target = bit_flip((current_inst & 0x3FFFFFF));		//get target register
+	    uint32_t immediate = bit_flip((current_inst & 0xffff));		//get immediate value
+  	    uint32_t temp;
+	    uint32_t temp2;
 
 	if(op_code == 0b000000){
             switch(funct)
+	    A
 		{
                 case 0b100000:        //ADD
 		    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + CURRENT_STATE.REGS[rs];
