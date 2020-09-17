@@ -316,7 +316,8 @@ void handle_instruction()
 	    uint32_t immediate = (current_inst & 0xffff);		//get immediate value
 	    uint32_t shift = (current_inst >> 6) & 0x1F;
 	    uint32_t offset = (current_inst & 0xFFFF);
-
+  	    uint32_t temp = 0x00000000;
+	    uint32_t temp2 = offset & 0x8000 << 16;
 
 	if(op_code == 0b000000){
             switch(funct)
@@ -436,8 +437,8 @@ void handle_instruction()
 
 	switch (op_code){
         case 0b001000:                //ADDI
-	    uint32_t temp2 = (immediate & 0x8000) << 16;
-	    uint32_t temp = 0x00000000;
+	    temp2 = (immediate & 0x8000) << 16;
+	    temp = 0x00000000;
 			for(int i =0; i<17; i++)
 			{
 			temp & temp2;
@@ -448,8 +449,8 @@ void handle_instruction()
             break;
 
         case 0b001001:                //ADDIU
-	    uint32_t temp2 = (immediate & 0x8000) << 16;
-	    uint32_t temp = 0x00000000;
+	    temp2 = (immediate & 0x8000) << 16;
+	    temp = 0x00000000;
 			for(int i =0; i<17; i++)
 			{
 			temp & temp2;
@@ -470,7 +471,7 @@ void handle_instruction()
         case 0b001110:                //XORI
 
             break;
-	    B
+	    
 
         case 0b001010:                //SLTI
             
@@ -498,6 +499,7 @@ void handle_instruction()
             break;
 
         case 0b001111:                //LUI
+	    
 
             break;
 
@@ -542,8 +544,8 @@ void handle_instruction()
             break;
 
         case 0b000111:                //BGTZ
-				uint32_t temp = 0x00000000;
-		uint32_t temp2 = offset & 0x8000 << 16;
+		 temp = 0x00000000;
+		 temp2 = offset & 0x8000 << 16;
 
 		if(CURRENT_STATE.REGS[rs] != 0)
 		{
