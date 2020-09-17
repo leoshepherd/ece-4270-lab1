@@ -480,13 +480,38 @@ void handle_instruction()
 
         case 0b001010:                //SLTI
             
+			
+		 temp = 0x00000000;
+		temp2 = offset & 0x8000 << 16;
+
+			for(int i =0; i<15; i++)
+			{
+				temp = temp & temp2;
+				temp = temp >> 1;
+			}
+		
+		
+			temp = temp & offset;
+			temp = temp << 2 ;
+
+			target = temp;
+		
+			if(CURRENT_STATE.REGS[rs] < (target <<16 | (immediate & 0x0000FFFF)))
+			{
+				NEXT_STATE.REGS[rd] = 0x00000001;
+			}
+			else
+			{
+				NEXT_STATE.REGS[rd] = 0x0;
+			}
 
             break;
 
         case 0b000010:                //J
-	    temp = target << 2;
-	    temp2 = CURRENT_STATE.PC & 0xE0000000;
-	    NEXT_STATE.PC = temp2 || temp;
+		temp = target <<2;
+		temp2 = CURRENT_STATE.PC & 0xE0000000;
+		NEXT_STATE.PC = temp2 || temp;
+
             break;
 
         case 0b000011:                //JAL
