@@ -461,6 +461,7 @@ void handle_instruction()
             break;
 
         case 0b001100:                //ANDI
+	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] & immediate;
 
             break;
 
@@ -468,10 +469,11 @@ void handle_instruction()
 
 	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] || immediate;
             break;
+	    
 
         case 0b001110:                //XORI
 
-		NEXT_STATE.REGS[rt] = CURRENT_STATE.REGS[rs] ^ (((immediate & 0x00)<<16) | immediate);
+	    NEXT_STATE.REGS[rt] = CURRENT_STATE.REGS[rs] ^ (((immediate & 0x00)<<16) | immediate);
 
             break;
 	    
@@ -491,7 +493,7 @@ void handle_instruction()
 		temp = target;
 		temp = temp << 2;
 		NEXT_STATE.REGS[31] = CURRENT_STATE.PC +8;
-		NEXT_START.PC = temp2 || temp;            
+		NEXT_STATE.PC = temp2 || temp;            
 		break;
 
         case 0b100011:                //LW
