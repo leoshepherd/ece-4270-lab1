@@ -470,6 +470,7 @@ void handle_instruction()
         case 0b001110:                //XORI
 
             break;
+	    B
 
         case 0b001010:                //SLTI
             
@@ -601,7 +602,7 @@ void print_program(){
 /* Print the instruction at given memory address (in MIPS assembly format)    */
 /************************************************************/
 void print_instruction(uint32_t addr){
-	printf("%lu", (unsigned long)CURRENT_STATE.REGS[addr]);
+	printf("%x", mem_read_32(addr));
 	/*IMPLEMENT THIS*/
 }
 
