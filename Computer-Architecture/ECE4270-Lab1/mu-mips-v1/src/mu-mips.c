@@ -859,7 +859,7 @@ void print_program(){
 /* Print the instruction at given memory address (in MIPS assembly format)    */
 /************************************************************/
 void print_instruction(uint32_t addr){
-	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
+	    uint32_t current_inst = mem_read_32(addr); 	//get current instruction
 	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;     	//get op code of instruction
 	    uint32_t funct = (current_inst & 0x1f);           	      	//get function code of instruction 
 	    uint32_t rs = (current_inst & 0x3E00000) >> 21;		//get rs register of instruction
