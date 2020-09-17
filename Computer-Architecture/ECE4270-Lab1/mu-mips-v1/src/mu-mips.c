@@ -315,6 +315,7 @@ void handle_instruction()
 	    uint32_t target = (current_inst & 0x3FFFFFF);		//get target register
 	    uint32_t immediate = (current_inst & 0xffff);		//get immediate value
 	    uint32_t shift = (current_inst >> 6) & 0x1F;
+	    uint32_t offset = (current_inst & 0xFFFF);
 
 
 	if(op_code == 0b000000){
@@ -498,6 +499,7 @@ void handle_instruction()
 
         case 0b000100:                //BEQ
 
+	    
             break;
 
         case 0b000101:                //BNE
@@ -508,12 +510,45 @@ void handle_instruction()
 
             break; 
         case 0b000001:
-            if (funct == 0b00000){}        //BLTZ
-                else{}            //BGEZ
+            if (funct == 0b00000)
+	    {
+
+
+
+	    
+	    }        //BLTZ
+
+            else
+	    {
+		
+	    }            //BGEZ
 
             break;
 
         case 0b000111:                //BGTZ
+				uint32_t temp = 0x00000000;
+		uint32_t temp2 = offset & 0x8000 << 16;
+
+		if(CURRENT_STATE.REGS[rs] != 0)
+		{
+
+			for(int i =0; i<15; i++)
+			{
+			temp & temp2;
+			temp >> 1;
+			}
+		
+		
+			temp = temp & offset;
+			temp << 2 ;
+
+			NEXT_STATE.PC = temp;
+			}
+		else
+		{
+
+			break;
+		}
 
             break;
 }
