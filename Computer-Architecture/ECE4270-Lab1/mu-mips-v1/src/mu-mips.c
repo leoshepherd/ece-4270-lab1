@@ -443,6 +443,7 @@ void handle_instruction()
 			temp & temp2;
 			temp >> 1;
 			}
+	    temp = temp & immediate;
 	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + temp;
             break;
 
