@@ -859,7 +859,223 @@ void print_program(){
 /* Print the instruction at given memory address (in MIPS assembly format)    */
 /************************************************************/
 void print_instruction(uint32_t addr){
-	printf("%x\n", mem_read_32(addr));
+	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
+	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;     	//get op code of instruction
+	    uint32_t funct = (current_inst & 0x1f);           	      	//get function code of instruction 
+	    uint32_t rs = (current_inst & 0x3E00000) >> 21;		//get rs register of instruction
+            uint32_t rt = (current_inst & 0x1F0000) >> 16;		//get rt register of instruction
+            uint32_t rd = (current_inst & 0xF800) >> 11;		//get desination register of instruction
+	    uint32_t target = (current_inst & 0x3FFFFFF);		//get target register
+	    uint32_t immediate = (current_inst & 0xffff);		//get immediate value
+	    
+
+	if(op_code == 0b000000){
+            switch(funct)
+		{
+                case 0b100000:        //ADD
+		   
+		    printf("ADD $%x, $%x, $%x\n", rd, rs, rt);
+
+                    break;
+
+                case 0b100001:        //ADDU
+                    printf("ADDU $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b100100:        //AND
+                    printf("AND $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b100010:        //SUB
+                    printf("SUB $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b100011:        //SUBU
+                    printf("SUBU $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b011000:        //MULT
+                    printf("MULT $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b011001:        //MULTU
+                   printf("MULTU $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b011010:        //DIV
+                  printf("DIV $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b011011:        //DIVU
+                  printf("DIVU $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+                
+                case 0b100101:        //OR
+                    printf("OR $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b100110:        //XOR
+                    printf("XOR $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b100111:        //NOR
+                    printf("NOR $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+		    
+                case 0b101010:        //SLT
+		    printf("SLT $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b001000:        //JR
+		    printf("JR $%x\n", rs);
+                    break;
+
+                case 0b001001:        //JALR
+		    printf("JALR $%x, $%x\n", rd, rs);
+                    break;                
+		case 0b000000:        //SLL
+	   		printf("SLL $%x, $%x, $%x\n", rd, rs, rt);
+                    break;
+
+                case 0b000010:        //SRL
+		   	printf("SRL $%x, $%x, 0x%x\n", rd, rt, sa);
+                    break;
+
+                case 0b000011:        //SRA
+			printf("SRA $%x, $%x, 0x%x\n", rd, rt, sa);
+                    break;
+
+                case 0b010000:        //MFHI
+			printf("MFHI $%x\n", rd);
+                    break;
+
+                case 0b010010:        //MFLO
+			printf("MFLO $%x\n", rd);
+                    break;
+
+                case 0b010001:        //MTHI
+			printf("MTHI $%x\n", rs);
+                    break;
+
+                case 0b010011:        //MTLO
+			printf("MTLO $%x\n", rs);
+                    break;
+		
+       		}
+		
+}	
+
+	else{
+
+	switch (op_code){
+        case 0b001000:                //ADDI
+	   printf("ADDI $%x, $%x, 0x%x\n", rt, rs, immediate);
+            break;
+
+        case 0b001001:                //ADDIU
+	   printf("ADDIU $%x, $%x, 0x%x\n", rt, rs, immediate);
+            break;
+
+        case 0b001100:                //ANDI
+	    printf("ANDI $%x, $%x, 0x%x\n", rt, rs, immediate);
+            break;
+
+        case 0b001101:                //ORI
+	    printf("ORI $%x, $%x, 0x%x\n", rt, rs, immediate);
+	                break;
+	    
+
+        case 0b001110:                //XORI
+
+	    printf("XORI $%x, $%x, 0x%x\n", rt, rs, immediate);
+            break;
+	    
+
+        case 0b001010:                //SLTI
+            printf("SLTI $%x, $%x, 0x%x\n", rt, rs, immediate);
+	    
+            break;
+
+        case 0b000010:                //J
+		printf("J $%x\n", target);
+
+            break;
+
+        case 0b000011:                //JAL
+
+		printf("JAL $%x\n", target);           
+		break;
+
+        case 0b100011:                //LW
+
+	   printf("LW $%x, 0x%x\n", rt, offset);		
+           break;
+
+        case 0b100000:                //LB
+	    printf("LB $%x, 0x%x\n", rt, offset);
+            break;
+
+        case 0b100001:                //LH
+	    printf("LH $%x, 0x%x\n", rt, offset);
+	    
+            break;
+
+        case 0b001111:                //LUI
+	   printf("LUI $%x, 0x%x\n", rt, immediate);
+
+            break;
+
+        case 0b101011:                //SW
+
+	    printf("SW $%x, 0x%x\n", rt, offset);
+            break;
+
+        case 0b101000:                //SB
+
+	    printf("SB $%x, 0x%x\n", rt, offset);
+            break;
+
+        case 0b101001:                //SH
+ 
+	    printf("SH $%x, 0x%x\n", rt, offset);
+            break;
+
+        case 0b000100:                //BEQ
+	
+	    printf("BEQ $%x, $%x, 0x%xn", rs, rt, offset);
+            break;
+
+        case 0b000101:                //BNE
+
+	    printf("BNE $%x, $%x, 0x%x\n", rs, rt, offset);
+            break;
+
+        case 0b000110:                //BLEZ
+
+	    printf("BLEZ $%x, 0x%x\n", rs, offset);
+            break; 
+
+        case 0b000001:
+            if (funct == 0b00000)	//BLTZ
+	    {
+			printf("BLTZ $%x, 0x%x\n", rs, offset);
+			break;
+		}
+	    else{                       //BGEZ
+		printf("BGEZ $%x, 0x%x\n", rs, offset);
+		
+	}        
+
+            break;
+
+        case 0b000111:                //BGTZ
+		 
+	    printf("BGTZ $%x, 0x%x\n", rs, offset);
+            break;
+}
+
+}
 	/*IMPLEMENT THIS*/
 }
 
