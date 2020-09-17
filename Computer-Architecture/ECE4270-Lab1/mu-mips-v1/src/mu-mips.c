@@ -320,7 +320,6 @@ void handle_instruction()
 
 	if(op_code == 0b000000){
             switch(funct)
-	    A
 		{
                 case 0b100000:        //ADD
 		    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + CURRENT_STATE.REGS[rs];
@@ -870,7 +869,7 @@ void print_instruction(uint32_t addr){
 
 uint32_t bit_flip(uint32_t v){
 	uint32_t r = v;         // r will be reversed bits of v; first get LSB of v
-	int s = sizeof(v) * CHAR_BIT - 1; // extra shift needed at end
+	uint32_t s = sizeof(v) * CHAR_BIT - 1; // extra shift needed at end
 
 	for (v >>= 1; v; v >>= 1){   
 	    r <<= 1;
