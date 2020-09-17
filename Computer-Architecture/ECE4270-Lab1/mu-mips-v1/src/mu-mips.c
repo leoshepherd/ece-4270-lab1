@@ -525,14 +525,53 @@ void handle_instruction()
 
         case 0b100011:                //LW
 
+		temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp & temp2;
+			temp = temp << 1;
+		}
+		
+		temp = temp || offset;
+
+		
+		NEXT_STATE.REGS[rt] = mem_read_32((temp+CURRENT_STATE.REGS[rs]));
+		
+
             break;
 
         case 0b100000:                //LB
+
+		temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp & temp2;
+			temp = temp << 1;
+		}
+		
+		temp = temp || offset;
+
+		
+		NEXT_STATE.REGS[rt] = mem_read_32((temp+CURRENT_STATE.REGS[rs])) >>24;
 
             break;
 
         case 0b100001:                //LH
 	
+		temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp & temp2;
+			temp = temp << 1;
+		}
+		
+		temp = temp || offset;
+
+		
+		NEXT_STATE.REGS[rt] = mem_read_32((temp+CURRENT_STATE.REGS[rs])) >>16;
 	
 
             break;
@@ -544,13 +583,56 @@ void handle_instruction()
 
         case 0b101011:                //SW
 
+		temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp & temp2;
+			temp = temp << 1;
+		}
+		
+		temp = temp || offset;
+
+		
+		mem_write_32((temp+CURRENT_STATE.REGS[rs]), CURRENT_STATE.REGS[rt]);
+
+
+
             break;
 
         case 0b101000:                //SB
 
+
+		temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp & temp2;
+			temp = temp << 1;
+		}
+		
+		temp = temp || offset;
+
+		
+	mem_write_32((temp+CURRENT_STATE.REGS[rs]), CURRENT_STATE.REGS[rt]);
+
             break;
 
         case 0b101001:                //SH
+
+
+		temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp & temp2;
+			temp = temp << 1;
+		}
+		
+		temp = temp || offset;
+
+		
+	mem_write_32((temp+CURRENT_STATE.REGS[rs]), CURRENT_STATE.REGS[rt]);
 
             break;
 
@@ -779,7 +861,7 @@ void print_program(){
 /* Print the instruction at given memory address (in MIPS assembly format)    */
 /************************************************************/
 void print_instruction(uint32_t addr){
-	printf("%x", mem_read_32(addr));
+	printf("%x\n", mem_read_32(addr));
 	/*IMPLEMENT THIS*/
 }
 
