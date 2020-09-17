@@ -441,7 +441,7 @@ void handle_instruction()
 	    temp = 0x00000000;
 			for(int i =0; i<17; i++)
 			{
-			temp & temp2;
+			temp = temp & temp2;
 			temp >> 1;
 			}
 	    temp = temp & immediate;
@@ -453,7 +453,7 @@ void handle_instruction()
 	    temp = 0x00000000;
 			for(int i =0; i<17; i++)
 			{
-			temp & temp2;
+			temp = temp & temp2;
 			temp >> 1;
 			}
 	    temp = temp & immediate;
