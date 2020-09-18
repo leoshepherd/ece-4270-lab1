@@ -308,7 +308,7 @@ void handle_instruction()
 {
 	
 	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
-	    uint32_t op_code = (current_inst & 0xfc000000) >> 28;     	//get op code of instruction
+	    uint32_t op_code = (current_inst & 0xfc000000) >> 26;     	//get op code of instruction
 	    uint32_t funct = current_inst & 0x3f;           	      	//get function code of instruction 
 	    uint32_t rs = (current_inst & 0x3e00000) >> 21;		//get rs register of instruction
             uint32_t rt = (current_inst & 0x1f0000) >> 16;		//get rt register of instruction
@@ -319,7 +319,8 @@ void handle_instruction()
 	    uint32_t shift = (current_inst & 0x7c0) >> 6; 
 	    uint32_t temp;
 	    uint32_t temp2;
-
+		
+	    NEXT_STATE.PC = CURRENT_STATE.PC + 0x4;
 	if(op_code == 0b000000){
             switch(funct)
 		{
@@ -439,26 +440,28 @@ void handle_instruction()
 	switch (op_code){
         case 0b001000:                //ADDI
 	    temp2 = (immediate & 0x8000) << 16;
-	    temp = 0x00000000;
-			for(int i =0; i<17; i++)
-			{
-			temp = temp & temp2;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp || temp2;
 			temp = temp >> 1;
-			}
-	    temp = temp & immediate;
-	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + temp;
+		}
+		
+		temp = temp || offset;
+	    NEXT_STATE.REGS[rt] = CURRENT_STATE.REGS[rs] + temp;
             break;
 
         case 0b001001:                //ADDIU
 	    temp2 = (immediate & 0x8000) << 16;
-	    temp = 0x00000000;
-			for(int i =0; i<17; i++)
-			{
-			temp = temp & temp2;
+	    	temp = 0x00000000;
+		for(int i =0; i<16; i++)
+		{
+			temp = temp || temp2;
 			temp = temp >> 1;
-			}
-	    temp = temp & immediate;
-	    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + temp;
+		}
+		
+		temp = temp || offset;
+	    NEXT_STATE.REGS[rt] = CURRENT_STATE.REGS[rs] + temp;
             break;
 
         case 0b001100:                //ANDI
@@ -482,16 +485,15 @@ void handle_instruction()
         case 0b001010:                //SLTI
             
 			
-		 temp = 0x00000000;
-		temp2 = offset & 0x8000 << 16;
-
-			for(int i =0; i<15; i++)
-			{
-				temp = temp & temp2;
-				temp = temp >> 1;
-			}
+		 temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp || temp2;
+			temp = temp >> 1;
+		}
 		
-			temp = temp & offset;
+		temp = temp || offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -529,8 +531,8 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<15; i++)
 		{
-			temp = temp & temp2;
-			temp = temp << 1;
+			temp = temp || temp2;
+			temp = temp >> 1;
 		}
 		
 		temp = temp || offset;
@@ -547,8 +549,8 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<15; i++)
 		{
-			temp = temp & temp2;
-			temp = temp << 1;
+			temp = temp || temp2;
+			temp = temp >> 1;
 		}
 		
 		temp = temp || offset;
@@ -564,8 +566,8 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<15; i++)
 		{
-			temp = temp & temp2;
-			temp = temp << 1;
+			temp = temp || temp2;
+			temp = temp >> 1;
 		}
 		
 		temp = temp || offset;
@@ -577,7 +579,7 @@ void handle_instruction()
             break;
 
         case 0b001111:                //LUI
-	   	NEXT_STATE.REGS[rt] = immediate;
+	   	NEXT_STATE.REGS[rt] = immediate << 16;
 
             break;
 
@@ -587,8 +589,8 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<15; i++)
 		{
-			temp = temp & temp2;
-			temp = temp << 1;
+			temp = temp || temp2;
+			temp = temp >> 1;
 		}
 		
 		temp = temp || offset;
@@ -607,8 +609,8 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<15; i++)
 		{
-			temp = temp & temp2;
-			temp = temp << 1;
+			temp = temp || temp2;
+			temp = temp >> 1;
 		}
 		
 		temp = temp || offset;
@@ -625,8 +627,8 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<15; i++)
 		{
-			temp = temp & temp2;
-			temp = temp << 1;
+			temp = temp || temp2;
+			temp = temp >> 1;
 		}
 		
 		temp = temp || offset;
@@ -639,20 +641,15 @@ void handle_instruction()
         case 0b000100:                //BEQ
 
 	   	
-	        temp = 0x00000000;
-		temp2 = offset & 0x8000 << 16;
-
-			for(int i =0; i<15; i++)
-			{
-				temp = temp & temp2;
-				temp = temp >> 1;
-			}
+	       temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp || temp2;
+			temp = temp >> 1;
+		}
 		
-		
-			temp = temp & offset;
-			temp = temp << 2 ;
-
-			target = temp;
+		temp = temp || offset;
 
 
 		if(CURRENT_STATE.REGS[rs] == CURRENT_STATE.REGS[rt] )
@@ -670,17 +667,15 @@ void handle_instruction()
 
         case 0b000101:                //BNE
 
-		temp = 0x00000000;
-		 temp2 = offset & 0x8000 << 16;
-
-			for(int i =0; i<15; i++)
-			{
-				temp = temp & temp2;
-				temp = temp >> 1;
-			}
+		temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp || temp2;
+			temp = temp >> 1;
+		}
 		
-		
-			temp = temp & offset;
+		temp = temp || offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -701,17 +696,15 @@ void handle_instruction()
 
         case 0b000110:                //BLEZ
 
-		temp = 0x00000000;
-		 temp2 = offset & 0x8000 << 16;
-
-			for(int i =0; i<15; i++)
-			{
-				temp = temp & temp2;
-				temp = temp >> 1;
-			}
+		temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp || temp2;
+			temp = temp >> 1;
+		}
 		
-		
-			temp = temp & offset;
+		temp = temp || offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -734,17 +727,16 @@ void handle_instruction()
             if (funct == 0b00000)	//BLTZ
 	    {
 
-		 temp = 0x00000000;
-		 temp2 = offset & 0x8000 << 16;
+		 temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp || temp2;
+			temp = temp >> 1;
+		}
+		
+		temp = temp || offset;
 
-			for(int i =0; i<15; i++)
-			{
-				temp = temp & temp2;
-				temp = temp >> 1;
-			}
-		
-		
-			temp = temp & offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -767,17 +759,15 @@ void handle_instruction()
 
             else	//BGEZ
 	    {
-	         temp = 0x00000000;
-		 temp2 = offset & 0x8000 << 16;
-
-			for(int i =0; i<15; i++)
-			{
-				temp = temp & temp2;
-				temp = temp >> 1;
-			}
+	        temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp || temp2;
+			temp = temp >> 1;
+		}
 		
-		
-			temp = temp & offset;
+		temp = temp || offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -798,17 +788,16 @@ void handle_instruction()
             break;
 
         case 0b000111:                //BGTZ
-		 temp = 0x00000000;
-		 temp2 = offset & 0x8000 << 16;
+		 temp2 = (immediate & 0x8000) << 16;
+	    	temp = 0x00000000;
+		for(int i =0; i<15; i++)
+		{
+			temp = temp || temp2;
+			temp = temp >> 1;
+		}
+		
+		temp = temp || offset;
 
-			for(int i =0; i<15; i++)
-			{
-				temp = temp & temp2;
-				temp = temp >> 1;
-			}
-		
-		
-			temp = temp & offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -861,8 +850,8 @@ void print_program(){
 /* Print the instruction at given memory address (in MIPS assembly format)    */
 /************************************************************/
 void print_instruction(uint32_t addr){
-	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
-	    uint32_t op_code = (current_inst & 0xfc000000) >> 28;     	//get op code of instruction
+	    uint32_t current_inst = mem_read_32(addr); 	//get current instruction
+	    uint32_t op_code = (current_inst & 0xfc000000) >> 26;     	//get op code of instruction
 	    uint32_t funct = current_inst & 0x3f;           	      	//get function code of instruction 
 	    uint32_t rs = (current_inst & 0x3e00000) >> 21;		//get rs register of instruction
             uint32_t rt = (current_inst & 0x1f0000) >> 16;		//get rt register of instruction
