@@ -441,7 +441,7 @@ void handle_instruction()
         case 0b001000:                //ADDI
 	    temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -487,7 +487,7 @@ void handle_instruction()
 			
 		 temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -505,12 +505,13 @@ void handle_instruction()
 			else
 			{
 				NEXT_STATE.REGS[rd] = 0x0;
+				B
 			}
 
             break;
 
         case 0b000010:                //J
-		temp = target <<2;
+		temp = target << 2;
 		temp2 = CURRENT_STATE.PC & 0xE0000000;
 		NEXT_STATE.PC = temp2 || temp;
 
@@ -529,7 +530,7 @@ void handle_instruction()
 
 		temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -547,7 +548,7 @@ void handle_instruction()
 
 		temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -564,7 +565,7 @@ void handle_instruction()
 	
 		temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -587,7 +588,7 @@ void handle_instruction()
 
 		temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -607,7 +608,7 @@ void handle_instruction()
 
 		temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -625,7 +626,7 @@ void handle_instruction()
 
 		temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -643,7 +644,7 @@ void handle_instruction()
 	   	
 	       temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -669,7 +670,7 @@ void handle_instruction()
 
 		temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -698,7 +699,7 @@ void handle_instruction()
 
 		temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -729,7 +730,7 @@ void handle_instruction()
 
 		 temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -761,7 +762,7 @@ void handle_instruction()
 	    {
 	        temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
@@ -790,7 +791,7 @@ void handle_instruction()
         case 0b000111:                //BGTZ
 		 temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
-		for(int i =0; i<15; i++)
+		for(int i =0; i<16; i++)
 		{
 			temp = temp || temp2;
 			temp = temp >> 1;
