@@ -308,13 +308,15 @@ void handle_instruction()
 {
 	
 	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
-	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;     	//get op code of instruction
-	    uint32_t funct = current_inst & 0x1f;           	      	//get function code of instruction 
-	    uint32_t rs = (current_inst & 0x3E00000) >> 21;		//get rs register of instruction
-            uint32_t rt = (current_inst & 0x1F0000) >> 16;		//get rt register of instruction
-            uint32_t rd = (current_inst & 0xF800) >> 11;		//get desination register of instruction
-	    uint32_t target = (current_inst & 0x3FFFFFF);		//get target register
+	    uint32_t op_code = (current_inst & 0xfc000000) >> 28;     	//get op code of instruction
+	    uint32_t funct = current_inst & 0x3f;           	      	//get function code of instruction 
+	    uint32_t rs = (current_inst & 0x3e00000) >> 21;		//get rs register of instruction
+            uint32_t rt = (current_inst & 0x1f0000) >> 16;		//get rt register of instruction
+            uint32_t rd = (current_inst & 0xf800) >> 11;		//get desination register of instruction
+	    uint32_t target = (current_inst & 0x3ffffff);		//get target register
 	    uint32_t immediate = (current_inst & 0xffff);
+	    uint32_t offset = (current_inst & 0xffff);
+	    uint32_t shift = (current_inst & 0x7c0) >> 6; 
 	    uint32_t temp;
 	    uint32_t temp2;
 
@@ -859,15 +861,17 @@ void print_program(){
 /* Print the instruction at given memory address (in MIPS assembly format)    */
 /************************************************************/
 void print_instruction(uint32_t addr){
-	    uint32_t current_inst = mem_read_32(addr); 	//get current instruction
-	    uint32_t op_code = (current_inst & 0xFC000000) >> 28;     	//get op code of instruction
-	    uint32_t funct = (current_inst & 0x1f);           	      	//get function code of instruction 
-	    uint32_t rs = (current_inst & 0x3E00000) >> 21;		//get rs register of instruction
-            uint32_t rt = (current_inst & 0x1F0000) >> 16;		//get rt register of instruction
-            uint32_t rd = (current_inst & 0xF800) >> 11;		//get desination register of instruction
-	    uint32_t target = (current_inst & 0x3FFFFFF);		//get target register
-	    uint32_t immediate = (current_inst & 0xffff);		//get immediate value
-	    
+	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
+	    uint32_t op_code = (current_inst & 0xfc000000) >> 28;     	//get op code of instruction
+	    uint32_t funct = current_inst & 0x3f;           	      	//get function code of instruction 
+	    uint32_t rs = (current_inst & 0x3e00000) >> 21;		//get rs register of instruction
+            uint32_t rt = (current_inst & 0x1f0000) >> 16;		//get rt register of instruction
+            uint32_t rd = (current_inst & 0xf800) >> 11;		//get desination register of instruction
+	    uint32_t target = (current_inst & 0x3ffffff);		//get target register
+	    uint32_t immediate = (current_inst & 0xffff);
+	    uint32_t sa = (current_inst & 0x7c0) >> 6;		//get immediate value
+	    uint32_t offset = (current_inst & 0xffff);
+	     
 
 	if(op_code == 0b000000){
             switch(funct)
