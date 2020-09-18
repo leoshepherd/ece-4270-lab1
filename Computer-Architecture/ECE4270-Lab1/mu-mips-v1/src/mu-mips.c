@@ -306,10 +306,12 @@ void load_program() {
 /************************************************************/
 void handle_instruction()
 {
+
+
 	
 	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
 	    uint32_t op_code = (current_inst & 0xfc000000) >> 26;     	//get op code of instruction
-	    uint32_t funct = current_inst & 0x3f;           	      	//get function code of instruction 
+	    uint32_t funct = current_inst & 0x0000003f;           	      	//get function code of instruction 
 	    uint32_t rs = (current_inst & 0x3e00000) >> 21;		//get rs register of instruction
             uint32_t rt = (current_inst & 0x1f0000) >> 16;		//get rt register of instruction
             uint32_t rd = (current_inst & 0xf800) >> 11;		//get desination register of instruction
@@ -319,7 +321,8 @@ void handle_instruction()
 	    uint32_t shift = (current_inst & 0x7c0) >> 6; 
 	    uint32_t temp;
 	    uint32_t temp2;
-		
+	
+		    
 	    NEXT_STATE.PC = CURRENT_STATE.PC + 0x4;
 	if(op_code == 0b000000){
             switch(funct)
@@ -443,24 +446,26 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 	    NEXT_STATE.REGS[rt] = CURRENT_STATE.REGS[rs] + temp;
             break;
 
         case 0b001001:                //ADDIU
 	    temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
+		
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
-		
-		temp = temp || offset;
+
+		temp = temp | offset;
+	
 	    NEXT_STATE.REGS[rt] = CURRENT_STATE.REGS[rs] + temp;
             break;
 
@@ -489,11 +494,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -505,7 +510,7 @@ void handle_instruction()
 			else
 			{
 				NEXT_STATE.REGS[rd] = 0x0;
-				B
+				
 			}
 
             break;
@@ -513,7 +518,7 @@ void handle_instruction()
         case 0b000010:                //J
 		temp = target << 2;
 		temp2 = CURRENT_STATE.PC & 0xE0000000;
-		NEXT_STATE.PC = temp2 || temp;
+		NEXT_STATE.PC = temp2 | temp;
 
             break;
 
@@ -523,7 +528,7 @@ void handle_instruction()
 		temp = target;
 		temp = temp << 2;
 		NEXT_STATE.REGS[31] = CURRENT_STATE.PC +8;
-		NEXT_STATE.PC = temp2 || temp;            
+		NEXT_STATE.PC = temp2 | temp;            
 		break;
 
         case 0b100011:                //LW
@@ -532,11 +537,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 
 		
 		NEXT_STATE.REGS[rt] = mem_read_32((temp+CURRENT_STATE.REGS[rs]));
@@ -550,11 +555,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 
 		
 		NEXT_STATE.REGS[rt] = mem_read_32((temp+CURRENT_STATE.REGS[rs])) >>24;
@@ -567,11 +572,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 
 		
 		NEXT_STATE.REGS[rt] = mem_read_32((temp+CURRENT_STATE.REGS[rs])) >>16;
@@ -590,11 +595,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 
 		
 		mem_write_32((temp+CURRENT_STATE.REGS[rs]), CURRENT_STATE.REGS[rt]);
@@ -610,11 +615,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 
 		
 	mem_write_32((temp+CURRENT_STATE.REGS[rs]), CURRENT_STATE.REGS[rt]);
@@ -628,11 +633,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 
 		
 	mem_write_32((temp+CURRENT_STATE.REGS[rs]), CURRENT_STATE.REGS[rt]);
@@ -646,11 +651,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 
 
 		if(CURRENT_STATE.REGS[rs] == CURRENT_STATE.REGS[rt] )
@@ -672,11 +677,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -701,11 +706,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -732,11 +737,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 
 			temp = temp << 2 ;
 
@@ -764,11 +769,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 			temp = temp << 2 ;
 
 			target = temp;
@@ -793,11 +798,11 @@ void handle_instruction()
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
-			temp = temp || temp2;
+			temp = temp | temp2;
 			temp = temp >> 1;
 		}
 		
-		temp = temp || offset;
+		temp = temp | offset;
 
 			temp = temp << 2 ;
 
