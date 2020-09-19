@@ -308,7 +308,7 @@ void handle_instruction()
 {
 
 
-	
+	//rs take out 0
 	    uint32_t current_inst = mem_read_32(CURRENT_STATE.PC); 	//get current instruction
 	    uint32_t op_code = (current_inst & 0xfc000000) >> 26;     	//get op code of instruction
 	    uint32_t funct = current_inst & 0x0000003f;           	      	//get function code of instruction 
@@ -321,12 +321,16 @@ void handle_instruction()
 	    uint32_t shift = (current_inst & 0x7c0) >> 6; 
 	    uint32_t temp;
 	    uint32_t temp2;
-	
-		    
+
 	    NEXT_STATE.PC = CURRENT_STATE.PC + 0x4;
+
 	if(op_code == 0b000000){
             switch(funct)
 		{
+		case 0b001100:
+			NEXT_STATE.REGS[2] = 0xA;
+			RUN_FLAG = FALSE;	
+
                 case 0b100000:        //ADD
 		    NEXT_STATE.REGS[rd] = CURRENT_STATE.REGS[rt] + CURRENT_STATE.REGS[rs];
                     break;
@@ -533,19 +537,22 @@ void handle_instruction()
 
         case 0b100011:                //LW
 
-		temp2 = (immediate & 0x8000) << 16;
+
+		
+			
+		temp2 = (immediate & 0x8000) << 16;			
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
 			temp = temp | temp2;
 			temp = temp >> 1;
 		}
+							//rs is base 
+		temp = temp | offset;			//offset sign extension complete
 		
-		temp = temp | offset;
-
-		
-		NEXT_STATE.REGS[rt] = mem_read_32((temp+CURRENT_STATE.REGS[rs]));
-		
+//dont need these//tempbyte = ((temp + CURRENT_STATE.REGS[rs]) & 0x00000007) ^ (0b100);
+		//	NEXT_STATE.REGS[rt] = mem_read_32(  ((temp + CURRENT_STATE.REGS[rs])& 0x8000) + (8*tempbyte) );
+		NEXT_STATE.REGS[rt] = mem_read_32(temp+CURRENT_STATE.REGS[rs]);	
 
             break;
 
@@ -590,8 +597,8 @@ void handle_instruction()
             break;
 
         case 0b101011:                //SW
-
-		temp2 = (immediate & 0x8000) << 16;
+	    
+	    	temp2 = (immediate & 0x8000) << 16;			//sign extension loop
 	    	temp = 0x00000000;
 		for(int i =0; i<16; i++)
 		{
@@ -599,7 +606,7 @@ void handle_instruction()
 			temp = temp >> 1;
 		}
 		
-		temp = temp | offset;
+		temp = temp | offset; 
 
 		
 		mem_write_32((temp+CURRENT_STATE.REGS[rs]), CURRENT_STATE.REGS[rt]);
@@ -638,14 +645,12 @@ void handle_instruction()
 		}
 		
 		temp = temp | offset;
-
-		
-	mem_write_32((temp+CURRENT_STATE.REGS[rs]), CURRENT_STATE.REGS[rt]);
-
-            break;
+		mem_write_32((temp+CURRENT_STATE.REGS[rs]), CURRENT_STATE.REGS[rt]);
+		break;
 
         case 0b000100:                //BEQ
-
+			
+	    	printf("\n\nENTERED BRANCH\n\n");
 	   	
 	       temp2 = (immediate & 0x8000) << 16;
 	    	temp = 0x00000000;
@@ -661,10 +666,13 @@ void handle_instruction()
 		if(CURRENT_STATE.REGS[rs] == CURRENT_STATE.REGS[rt] )
 		{
 			NEXT_STATE.PC = CURRENT_STATE.PC + target;
+			printf("\n\nENTERED BRANCH\n\n");
+
 		}
 
 		else
 		{
+			printf("\n\nENTERED BRANCH\n\n");
 
 			break;
 		}
@@ -960,7 +968,8 @@ void print_instruction(uint32_t addr){
                 case 0b010011:        //MTLO
 			printf("MTLO $%x\n", rs);
                     break;
-		
+		case 0b001100:
+	    		printf("SYSCALL $v0, 0xA\n");	    
        		}
 		
 }	
